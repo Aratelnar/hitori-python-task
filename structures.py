@@ -6,6 +6,8 @@ class Map:
             self.extract_map(data)
         else:
             self.data = [[Cell(0)] * width] * height
+        self.width = len(self.data[0])
+        self.height = len(self.data)
 
     def __str__(self) -> str:
         return "\n".join(" ".join(map(str, line)) for line in self.data)
@@ -33,6 +35,3 @@ class Cell:
             return Cell(n, 0)
         else:
             return Cell(n)
-
-with open("tests/8x8.txt", 'r') as f:
-    print(Map(data=f.read()))
