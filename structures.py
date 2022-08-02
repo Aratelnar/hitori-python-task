@@ -1,37 +1,68 @@
-import functools
-
 class Map:
-    def __init__(self, height = 0, width = 0, data = None) -> None:
-        if data != None:
-            self.extract_map(data)
-        else:
-            self.data = [[Cell(0)] * width] * height
-        self.width = len(self.data[0])
-        self.height = len(self.data)
+    def __init__(self, data) -> None:
+        self.data = data
 
-    def __str__(self) -> str:
-        return "\n".join(" ".join(map(str, line)) for line in self.data)
+    def __iter__(self):
+        return iter(self.data)
 
-    def extract_map(self, data: str):
-        lines = data.split("\n")
-        m = [line.split(" ") for line in lines]
-        self.data = [[item for item in map(Cell.extract_cell, line)] for line in m]
+    def __getitem__(self, coord):
+        return self.data[coord]
+
+    def neighbours(self, coord):
+        return self._neighbours(coord, 1)
+
+    def lines(self, coord):
+        for i in range(self.size):
+            yield from self._neighbours(coord, i)
+
+
+class RectMap(Map):
+    def __init__(self, data) -> None:
+        super().__init__(data)
+        self.height = len(data)
+        self.width = len(max(data, key=len))
+        self.size = max(self.height, self.width)
+
+    def _neighbours(self, coord, i):
+        if coord[1] < self.width-i:
+            yield coord[0], coord[1]+i
+        if coord[1] > 0:
+            yield coord[0], coord[1]-i
+        if coord[0] < self.height-i:
+            yield coord[0]+i, coord[1]
+        if coord[0] > 0:
+            yield coord[0]-i, coord[1]
+
+    def __iter__(self):
+        for row in range(self.height):
+            for col in range(self.width):
+                yield row, col
+
+    def __getitem__(self, coord):
+        return self.data[coord[0]][coord[1]]
+
+class HexMap(Map):
+    def _neighbours(self, coord, i):
+        x, y = coord
+        if (x+i, y) in self:
+            yield (x+i, y)
+        if (x, y+i) in self:
+            yield (x, y+i)
+        if (x-i, y) in self:
+            yield (x-i, y)
+        if (x, y-i) in self:
+            yield (x, y-i)
+        if (x+i, y-i) in self:
+            yield (x+i, y-i)
+        if (x-i, y+i) in self:
+            yield (x-i, y+i)
+
+
+class TriMap(Map):
+    pass
 
 
 class Cell:
     def __init__(self, number, color = None) -> None:
         self.number = number
         self.color = color
-
-    def __str__(self) -> str:
-        return f"{'-' if self.color == 1 else '#' if self.color == 0 else '.'}{self.number}"
-
-    def extract_cell(data: str):
-        c = data[0]
-        n = int(data[1])
-        if c == "-":
-            return Cell(n, 1)
-        elif c == "#":
-            return Cell(n, 0)
-        else:
-            return Cell(n)
