@@ -5,9 +5,9 @@ from coder import *
 
 
 def solve(imap: Map, coder):
-    stack = [coder.encode_map(imap)]
+    stack = [imap.copy()]
     while len(stack):
-        map = coder.decode_map(stack.pop())
+        map = stack.pop()
         coord = find_first_match(map, None)
         if coord == None:
             yield map
@@ -15,11 +15,11 @@ def solve(imap: Map, coder):
         for c in [0,1]:
             res, m = solve_one(map, coord, c, coder)
             if res:
-                stack.append(coder.encode_map(m))
+                stack.append(m)
 
 
 def solve_one(imap: Map, coord, color, coder):
-    map = coder.decode_map(coder.encode_map(imap))
+    map = imap.copy()
     queue = [(coord, color)]
     checked = set()
     while len(queue):

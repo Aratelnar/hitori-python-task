@@ -51,8 +51,3 @@ class HexCoder(Coder):
             else:
                 lines[i] += f" {self.encode_cell(m[i, j])}"
         return "\n".join(lines.values())
-
-
-
-class NumCoder(RectCoder):
-    pass

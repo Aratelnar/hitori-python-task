@@ -1,3 +1,6 @@
+import copy
+
+
 class Map:
     def __init__(self, data) -> None:
         self.data = data
@@ -15,6 +18,9 @@ class Map:
         for i in range(self.size):
             yield from self._neighbours(coord, i)
 
+    def copy(self):
+        pass
+
 
 class RectMap(Map):
     def __init__(self, data) -> None:
@@ -22,6 +28,9 @@ class RectMap(Map):
         self.height = len(data)
         self.width = len(max(data, key=len))
         self.size = max(self.height, self.width)
+
+    def copy(self):
+        return copy.deepcopy(self)
 
     def _neighbours(self, coord, i):
         if coord[1] < self.width-i:
@@ -42,6 +51,9 @@ class RectMap(Map):
         return self.data[coord[0]][coord[1]]
 
 class HexMap(Map):
+    def copy(self):
+        return copy.deepcopy(self)
+
     def _neighbours(self, coord, i):
         x, y = coord
         if (x+i, y) in self:
