@@ -19,6 +19,17 @@
             "program": "main.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "main-cli",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "args": [
+                "-h"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }
