@@ -4,7 +4,7 @@ from rules import *
 from coder import *
 
 
-def solve(imap: Map, coder):
+def solve(imap: Map):
     stack = [imap.copy()]
     while len(stack):
         map = stack.pop()
@@ -13,12 +13,12 @@ def solve(imap: Map, coder):
             yield map
             continue
         for c in [0,1]:
-            res, m = solve_one(map, coord, c, coder)
+            res, m = solve_one(map, coord, c)
             if res:
                 stack.append(m)
 
 
-def solve_one(imap: Map, coord, color, coder):
+def solve_one(imap: Map, coord, color):
     map = imap.copy()
     queue = [(coord, color)]
     checked = set()
