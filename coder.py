@@ -66,7 +66,8 @@ class JsonCoder(Coder):
             dict["data"] = [[item for item in map(self.encode_cell, line)] for line in m.data]
         elif type(m) is HexMap:
             dict["type"] = "hex"
-            dict["data"] = {key: self.encode_cell(value) for (key, value) in m.data.items}
+            dict["size"] = m.size
+            dict["data"] = {";".join(map(str, key)): self.encode_cell(value) for (key, value) in m.data.items()}
         return self.encoder.encode(dict)
 
     def decode_map(self, data: str) -> Map:
@@ -74,4 +75,6 @@ class JsonCoder(Coder):
         if dict['type'] == "rect":
             return RectMap([[item for item in map(self.decode_cell, line)] for line in dict['data']])
         elif dict['type'] == "hex":
-            return HexMap({key: self.decode_cell(value) for key, value in dict['data'].items})
+            result = HexMap({tuple(map(int, key.split(';'))): self.decode_cell(value) for key, value in dict['data'].items()})
+            result.size = dict['size']
+            return result
