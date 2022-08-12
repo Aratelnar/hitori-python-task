@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from ast import arg
 import sys
 import solver
 
@@ -10,6 +11,10 @@ subparsers = parser.add_subparsers(title="Commands", dest='command')
 
 parser_solve = subparsers.add_parser("solve", help="solve loaded puzzle")
 parser_solve.add_argument('-f', '--file', nargs='?')
+
+parser_print = subparsers.add_parser("print", help="displays loaded map or solution")
+parser_print.add_argument('--index', '-i', action='store_true')
+parser_print.add_argument('number', type=int, default=None, nargs='?')
 
 parser_load = subparsers.add_parser("load", help="load puzzle")
 parser_load.add_argument('path')
@@ -36,9 +41,22 @@ coders = {
 def main(args=sys.argv[1:]):
     map = None
     while True:
-        arg = parser.parse_args(args)
+        try:
+            arg = parser.parse_args(args)
+        except SystemExit:
+            pass
         if arg.command == 'solve':
             solved = solve(arg, map)
+        elif arg.command == 'print':
+            if arg.index:
+                print_map(solved[arg.number])
+            else:
+                if arg.number == None:
+                    print_map(map)
+                elif arg.number <= 0:
+                    print_map(*solved)
+                else:
+                    print_map(*solved[:arg.number])
         elif arg.command == 'load':
             map = load(arg.path, arg.format)
         elif arg.command == 'save':
@@ -56,8 +74,19 @@ def main(args=sys.argv[1:]):
 def solve(arg, map):
     if arg.file != None:
         map = load(arg.file)
-    return list(solver.solve(map))
+    result = list(solver.solve(map))
+    print(f'Solved. Found {len(result)} solutions')
+    print('Use :print {number}: to display solution')
+    return result
     
+
+def print_map(*maps):
+    print('-' * (maps[0].size * 2 - 1))
+    for map in maps:
+        for line in Visualiser().visualize_map(map):
+            print(line)
+        print('-' * (map.size * 2 - 1))
+
 
 def load(path, format="json"):
     with open(path, 'r') as f:

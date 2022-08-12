@@ -78,3 +78,27 @@ class JsonCoder(Coder):
             result = HexMap({tuple(map(int, key.split(';'))): self.decode_cell(value) for key, value in dict['data'].items()})
             result.size = dict['size']
             return result
+
+
+class Visualiser:
+    def visualize_map(self, m: Map) -> list:
+        if type(m) is RectMap:
+            return [" ".join(map(self.visualize_cell, line)) for line in m.data]
+        elif type(m) is HexMap:
+            lines = {}
+            for i,j in sorted(m):
+                if i not in lines:
+                    lines[i] = f"{self.visualize_cell(m[i, j])}"
+                else:
+                    lines[i] += f" {self.visualize_cell(m[i, j])}"
+            lines = {k:" "*k + v + " "*k for k, v in lines.items()}
+            result = []
+            for i in sorted(lines):
+                result.insert(0, lines[i])
+            return result
+
+    def visualize_cell(self, cell: Cell) -> str:
+        if cell.color == 0:
+            return '#'
+        else:
+            return str(cell.number)
